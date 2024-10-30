@@ -6,10 +6,9 @@ The dynamic genomic and transcriptomic changes underlying LUAD progression remai
 
 ## Requirements
 
-Tested on macOS Monterey (12.0.1)
-The data will be taken from the article's source data
+Tested on macOS Monterey (12.0.1). The data will be taken from the article's source data.
 
-## Sofrwares used in this project
+## Softwares used in this project
 
 | Software                              | Version     | Link |
 | :------------------------------------ | :---------- | :--- |
