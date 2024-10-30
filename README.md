@@ -4,6 +4,8 @@
 
 The dynamic genomic and transcriptomic changes underlying LUAD progression remain incompletely understood. Here we analysed genomic and transcriptomic profiles of 1,008 LUAD samples, encompassing all developmental stages in 954 patients, with comprehensive follow-up data. Frequently mutated driver genes were identified, with more mutations in tumor suppressor genes and higher levels of genomic instability observed as the disease progressed. Notably, MAP2K1 E102-I103 deletion was frequently identified in pre-invasive samples, which endowed Alveolar Type II (ATII) cells with increased growth potential and initiated tumor formation, suggesting it a potential driver mutation of LUAD. In summary, our study highlights key molecular changes in the stepwise progression of lung adenocarcinoma, provides insights into identifying novel therapeutic targets, and helps define the curative time window for this disease.
 
+  <img width="700" alt="study-design" src="./images/overview.png">
+
 ## Requirements
 
 Tested on macOS Monterey (12.0.1). The data will be taken from the article's source data.
