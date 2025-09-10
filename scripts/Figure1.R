@@ -6,69 +6,35 @@ library(survminer)
 library(data.table)
 library(networkD3)
 
-### Figure 1B and 1C ------
+### Figure 1B ------
+dt_nrd <- readRDS('./data/figure1/dt_nrd.rds')
+pt <- ggplot(dt_nrd, aes(var, group, fill = ratio)) +
+  geom_tile(color = "white") +
+  scale_fill_gradient2(low = "#1F78B4", mid = "white",  high = "orange2", 
+                       midpoint = 50, space = "Lab", 
+                       name = "log10(P)") +
+  theme_minimal()+ # minimal theme
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, 
+                                   size = 8, hjust = 1)) +
+  facet_grid(facet_g ~ phe, scales = 'free', space = 'free') +  
+  coord_trans() + 
+  geom_text(aes(var, group, label = ratio2), color = "black", size = 4) +
+  theme(
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.border = element_blank(),
+    panel.background = element_blank(),
+    axis.ticks = element_blank(),
+    legend.justification = c(-2, 0),
+    legend.position = c(0.6, 0.7),
+    legend.direction = "vertical") +
+  guides(fill = guide_colorbar(barwidth = 1.5, barheight = 10,
+                               title.position = "top", title.hjust = 0.5))
+print(pt)
+
+### Figure 1C and 1D ------
 dt_cli <- readRDS('./data/figure1/lc_1000_cli.rds')
-dt_cli_long <- data.table(table(dt_cli[, c('GGO', 'P_stage2'), with = FALSE])) %>% 
-  dcast(GGO ~ P_stage2, value.var = 'N') %>% 
-  gather(key = 'key', value = 'value', -GGO)
-dt_cli_long <- dt_cli_long[dt_cli_long$value > 0, ]
-
-colnames(dt_cli_long) <- c("source", "target", "value")
-dt_cli_long$target <- paste(dt_cli_long$target, " ", sep = "")
-
-nodes <- data.frame(name=c(as.character(dt_cli_long$source), as.character(dt_cli_long$target)) %>% unique())
-dt_cli_long$IDsource = match(dt_cli_long$source, nodes$name) - 1 
-dt_cli_long$IDtarget = match(dt_cli_long$target, nodes$name) - 1
-
-# prepare colour scale
-ggo_stage_color <- 'd3.scaleOrdinal() .range(["#6BAED6", "#FD8D3C", "#9E9AC8", "#C6DBEF", "#08519C", "#FDAE6B", "#D94801", "#9E9AC8"])'
-ColourScal = ggo_stage_color
-sankeyNetwork(Links = dt_cli_long, 
-              Nodes = nodes,
-              Source = "IDsource", 
-              Target = "IDtarget",
-              Value = "value", 
-              NodeID = "name", 
-              sinksRight = FALSE, 
-              colourScale = ColourScal, 
-              nodeWidth = 40, 
-              fontSize = 13, 
-              nodePadding = 20)
-
-
-three_var <- list(c('GGO', 'RFS_Status', 'P_stage2'))
-dt_cli_d <- dt_cli[RFS_Status == 1]
-dt_cli_long_ggo <- data.table(table(dt_cli_d[, c('GGO', 'RFS_Status'), with = FALSE])) %>% 
-  dcast(GGO ~ RFS_Status, value.var = 'N') %>% 
-  gather(key = 'key', value = 'value', -GGO)
-colnames(dt_cli_long_ggo) <- c("source", "target", "value")
-
-dt_cli_long_stage <- data.table(table(dt_cli_d[, c('RFS_Status', 'P_stage2'), with = FALSE])) %>% 
-  dcast(RFS_Status ~ P_stage2, value.var = 'N') %>% 
-  gather(key = 'key', value = 'value', -RFS_Status)
-colnames(dt_cli_long_stage) <- c("source", "target", "value")
-dt_cli_long <- rbind(dt_cli_long_ggo, dt_cli_long_stage)
-
-nodes <- data.frame(name=c(as.character(dt_cli_long$source), as.character(dt_cli_long$target)) %>% unique())
-dt_cli_long$IDsource = match(dt_cli_long$source, nodes$name) - 1 
-dt_cli_long$IDtarget = match(dt_cli_long$target, nodes$name) - 1
-
-# prepare colour scale
-ggo_stage_color <- 'd3.scaleOrdinal() .range(["#FD8D3C", "#9E9AC8", "darkred", "#C6DBEF", "#08519C", "#FDAE6B", "#D94801", "#9E9AC8"])'
-ColourScal = ggo_stage_color
-sankeyNetwork(Links = dt_cli_long, 
-              Nodes = nodes,
-              Source = "IDsource", 
-              Target = "IDtarget",
-              Value = "value", 
-              NodeID = "name", 
-              sinksRight = FALSE, 
-              colourScale = ColourScal, 
-              nodeWidth = 40, 
-              fontSize = 13, 
-              nodePadding = 20)
-
-### Figure 1D and 1E ------
 lapply(c('P_stage2', 'GGO'), function(x){
   dt_sur_u <- dt_cli[x, on = 'gene']
   
@@ -87,39 +53,4 @@ lapply(c('P_stage2', 'GGO'), function(x){
              data = dt_sur, 
              risk.table = TRUE, 
              tables.height = 0.25) 
-})
-
-### Figure 1F-1I ------
-dt_ratio_cli <- readRDS('./data/figure1/cli_ratio.rds')
-lapply(c('age', 'somking', 'gender', 'histology'), function(x){
-  dt_ratio <- dt_ratio_cli[x, on = 'var']
-  pt <- ggplot(dt_ratio, 
-               aes(x = group, 
-                   y = ratio, 
-                   fill = type)) +
-    geom_bar(stat = "identity") + 
-    facet_grid(. ~ var_type) + 
-    theme_few() +
-    theme(axis.text.x = element_text(angle = 45, 
-                                     vjust = 1, 
-                                     size = 8, 
-                                     hjust = 1))
-  print(pt)
-})
-
-### Figure 1J and 1K ------
-dt_num_cli <- readRDS('./data/figure1/cli_ratio.rds')
-lapply(c('met_site', 'rfs_time'), function(x){
-  dt_num <- dt_num_cli[x, on = 'var']
-  pt <- ggplot(dt_num, 
-               aes(x = group, 
-                   y = ratio, 
-                   fill = group)) +
-    geom_bar(stat = "identity") + 
-    theme_few() +
-    theme(axis.text.x = element_text(angle = 45, 
-                                     vjust = 1, 
-                                     size = 8, 
-                                     hjust = 1))
-  print(pt)
 })
